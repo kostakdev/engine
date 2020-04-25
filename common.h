@@ -3,12 +3,14 @@
 
 #define _GNU_SOURCE 1
 #include <errno.h>
+#include <fcntl.h>
 #include <getopt.h>
 #include <libgen.h>
 #include <linux/limits.h>
 #include <linux/netlink.h>
 #include <linux/rtnetlink.h>
 #include <linux/veth.h>
+#include <net/if.h>
 #include <sched.h>
 #include <signal.h>
 #include <stdbool.h>

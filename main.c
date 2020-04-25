@@ -33,16 +33,17 @@ static bool check_kernel_version() {
 
 
 int main(int argc, char **argv) {
-  if(!check_kernel_version()) {
-    exit(EXIT_FAILURE);
-  }
-
+  
   exec_param_t params;
   memset(&params, 0, sizeof(exec_param_t));
   parse_arg(argc, argv, &params);
 
   log_set_level(params.log_level);
   
+  if(!check_kernel_version()) {
+    exit(EXIT_FAILURE);
+  }
+
   struct rlimit lim;
   static size_t child_stack_size = 1024 * KBYTES;
 
