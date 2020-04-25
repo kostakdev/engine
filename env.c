@@ -2,6 +2,7 @@
 #include "env.h"
 
 static const size_t env_init_cap = 256;
+
 void init_env_buf(env_var_t* e) {
   memset(e, 0, sizeof(env_var_t));
 

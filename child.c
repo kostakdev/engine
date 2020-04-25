@@ -4,6 +4,12 @@
 #include "mount_ns.h"
 
 int child_exec(void *stuff) {
+
+  if (-1 == prctl(PR_SET_PDEATHSIG, SIGKILL)) {
+    log_error("Cannot set PR_SET_DEATHSIG for child process: %m");
+    return EXIT_FAILURE;
+  }
+
   exec_param_t *params = (exec_param_t *) stuff;
 
   if (-1 == sethostname(params->utsname, strlen(params->utsname))) {

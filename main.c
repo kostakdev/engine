@@ -1,6 +1,7 @@
 
 #include "child.h"
 #include "common.h"
+#include "net_eth.h"
 #include "param.h"
 
 int main(int argc, char **argv) {
@@ -38,6 +39,9 @@ int main(int argc, char **argv) {
 
   log_debug("Started, parent %ld, child %ld", (long) getpid(), (long) child_pid);
 
+  if (-1 == prepare_netns()) {
+    PANIC("Error preparing network namespace: %m");
+  }
   if (-1 == waitpid(child_pid, NULL, 0)) {
     PANIC("Error when waiting child process: %m\n");
   }
