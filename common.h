@@ -2,6 +2,7 @@
 #define COMMON_H 1
 
 #define _GNU_SOURCE 1
+#include <errno.h>
 #include <getopt.h>
 #include <libgen.h>
 #include <linux/limits.h>
@@ -15,6 +16,7 @@
 #include <sys/mman.h>
 #include <sys/mount.h>
 #include <sys/resource.h>
+#include <sys/stat.h>
 #include <sys/time.h>
 #include <sys/types.h>
 #include <sys/wait.h>

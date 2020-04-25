@@ -26,6 +26,8 @@ int main(int argc, char **argv) {
 
   const int clone_flags = SIGCHLD
     | CLONE_NEWNS
+    | CLONE_NEWPID
+    | CLONE_NEWNET
     | CLONE_NEWUTS;
 
   const pid_t child_pid = clone(child_exec, stack_top, clone_flags, (void*) &params);

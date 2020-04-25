@@ -1,4 +1,5 @@
 #include "common.h"
+#include "env.h"
 #include "param.h"
 
 
@@ -26,6 +27,7 @@ static struct option long_options[] = {
   {"debug", no_argument,        0, 'd'},
   {"verbose", no_argument,      0, 'v'},
   {"rootfs", required_argument, 0, 'r'},
+  {"env", required_argument,    0, 'e'},
   {0,       0,                  0,  0 },
 };
 
@@ -44,11 +46,17 @@ void parse_arg(int argc, char **argv, exec_param_t *param)
 
   int c;
   int option_index = 0;
-  static const char *opt_short_string = "hu:vdtr:";
+  static const char *opt_short_string = "hu:vdtr:e:";
 
   param->log_level = LOG_WARN;
   param->utsname = default_hostname;
   param->rootfs = default_rootfs;
+
+  init_env_buf(&param->env);
+
+  add_env(&param->env, "PS1=\\u@\\h:\\w\\$ ");
+  add_env(&param->env, "TERM=screen");
+  add_env(&param->env, "PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin");
   
   while( -1 != (c = getopt_long(argc, argv, opt_short_string, long_options, &option_index))) {
     switch(c) {
@@ -70,6 +78,13 @@ void parse_arg(int argc, char **argv, exec_param_t *param)
         break;
       case 't':
         set_param_loglevel(param, LOG_TRACE);
+        break;
+      case 'e':
+        if (NULL != strchr(optarg, '=')) {
+          add_env(&param->env, optarg);
+        } else {
+          log_debug("Cannot add '%s' as environment variable", optarg);
+        }
         break;
       case '?':
         print_usage();

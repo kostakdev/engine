@@ -1,6 +1,25 @@
 #include "common.h"
 #include "mount_ns.h"
 
+static inline int mount_proc() {
+  int e;
+  if (-1 == (e = mkdir("/proc", 0555))) {
+    if (EEXIST == errno) {
+      log_debug("/proc directory exists, skipping");
+    } else {
+      log_error("Error creating /proc directory: %m");
+      return -1;
+    }
+  }
+
+  if (-1 == mount("proc", "/proc", "proc", 0, "")) {
+    log_error("Error mounting proc filesystem: %m");
+    return -1;
+  }
+
+  return 0;
+}
+
 int change_root(const char *newroot) {
   if (-1 == mount("", "/", "",
             MS_REC
@@ -54,10 +73,14 @@ int change_root(const char *newroot) {
     return -1;
   }
 
-  char base_old_dir[PATH_MAX];
+  if (-1 == mount_proc()) {
+    return -1;
+  }
+
+  char base_old_dir[] = "put.old.XXXXXX";
   char *old_dir = basename(put_old);
 
-  strncpy(base_old_dir, old_dir, PATH_MAX);
+  memmove(base_old_dir, old_dir, sizeof(base_old_dir));
 
   if (-1 == umount2(old_dir, MNT_DETACH)) {
     log_error("Failure unmounting %s: %m", old_dir);
