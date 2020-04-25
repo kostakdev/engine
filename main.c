@@ -4,7 +4,39 @@
 #include "net_eth.h"
 #include "param.h"
 
+/* This program only works on kernel 3.13 and up */
+static bool check_kernel_version() {
+  struct utsname buffer;
+
+  if (-1 == uname(&buffer)) {
+    log_error("Cannot get uname.");
+    return false;
+  }
+
+  log_debug("Kernel release: %s", buffer.release);
+
+  /* xx.x.x */
+  char *p = buffer.release;
+  char *dot;
+  int major = strtoul(p, &dot, 10);
+  int minor = strtoul(dot + 1, NULL, 10);
+
+  bool verdict = major > 3 || (major == 3 && minor > 13);
+
+  log_debug("Parsed version %d.%d", major, minor);
+  if (!verdict) {
+    log_warn("This program only supported on linux 3.13 and up. Your linux is: %d.%d", major, minor);
+  }
+
+  return verdict;
+}
+
+
 int main(int argc, char **argv) {
+  if(!check_kernel_version()) {
+    exit(EXIT_FAILURE);
+  }
+
   exec_param_t params;
   memset(&params, 0, sizeof(exec_param_t));
   parse_arg(argc, argv, &params);
@@ -39,7 +71,7 @@ int main(int argc, char **argv) {
 
   log_debug("Started, parent %ld, child %ld", (long) getpid(), (long) child_pid);
 
-  if (-1 == prepare_netns()) {
+  if (-1 == prepare_netns(child_pid)) {
     PANIC("Error preparing network namespace: %m");
   }
   if (-1 == waitpid(child_pid, NULL, 0)) {

@@ -6,12 +6,27 @@ static inline struct rtattr *nlmsg_tail(struct nlmsghdr *n)
   return (struct rtattr *)((uint8_t *)n + NLMSG_ALIGN(n->nlmsg_len));
 }
 
+void *reserve_space(struct nlmsghdr *n, int maxlen, size_t sz) 
+{
+  const ssize_t newlen = NLMSG_ALIGN(n->nlmsg_len) + NLMSG_ALIGN(sz);
+
+  if (newlen > maxlen) {
+    errno = ENOSPC;
+    return NULL;
+  }
+
+  n->nlmsg_len = newlen;
+  void *buf = nlmsg_tail(n);
+  memset(buf, 0, sz);
+  return buf;
+}
+
 int addattr_l(struct nlmsghdr *n,
               int maxlen, __u16 type,
               const void *data, __u16 alen)
 {
   const __u16 len = RTA_LENGTH(alen);
-  const int newlen = NLMSG_ALIGN(n->nlmsg_len) + RTA_ALIGN(len);
+  const ssize_t newlen = NLMSG_ALIGN(n->nlmsg_len) + RTA_ALIGN(len);
 
   if (newlen > maxlen)
   {

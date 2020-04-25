@@ -6,7 +6,10 @@ struct nl_ireq {
   struct ifinfomsg i;
 };
 
-int create_veth(const int sock_fd, const char *ifname, const char *peername)
+static const unsigned int UNUSED_IFI_CHANGE = 0xFFFFFFFFu;
+
+int create_veth(const int sock_fd, const char *ifname, 
+                const char *peername, const pid_t child_pid)
 {
   const __u16 flags = NLM_F_REQUEST | NLM_F_CREATE | NLM_F_EXCL | NLM_F_ACK;
   uint8_t buffer[PAYLOAD_MAX];
@@ -17,6 +20,8 @@ int create_veth(const int sock_fd, const char *ifname, const char *peername)
   req->n.nlmsg_flags = flags;
   req->n.nlmsg_type = RTM_NEWLINK;
   req->i.ifi_family = PF_NETLINK;
+  req->i.ifi_change = UNUSED_IFI_CHANGE;
+
 
   struct nlmsghdr *n = &req->n;
   const int maxlen = PAYLOAD_MAX;
@@ -25,8 +30,18 @@ int create_veth(const int sock_fd, const char *ifname, const char *peername)
   addattr_string(n, maxlen, IFLA_INFO_KIND, "veth");
   struct rtattr *infodata = addattr_nest(n, maxlen, IFLA_INFO_DATA);
   struct rtattr *vethinfo = addattr_nest(n, maxlen, VETH_INFO_PEER);
-  n->nlmsg_len += sizeof(struct ifinfomsg);
+
+  struct ifinfomsg *peerinfo = reserve_space(n, maxlen, sizeof(struct ifinfomsg));
+  if (NULL == peerinfo) {
+    log_error("Error reserving space: %m");
+    return -1;
+  }
+
+  peerinfo->ifi_family = IFA_UNSPEC;
+  peerinfo->ifi_change = UNUSED_IFI_CHANGE;
+
   addattr_string(n, maxlen, IFLA_IFNAME, peername);
+  addattr_uint32(n, maxlen, IFLA_NET_NS_PID, child_pid);
   addattr_nest_end(n, vethinfo); 
   addattr_nest_end(n, infodata);
   addattr_nest_end(n, linkinfo);
@@ -34,11 +49,11 @@ int create_veth(const int sock_fd, const char *ifname, const char *peername)
   return send_nlmsg(sock_fd, (struct nlmsghdr *)buffer, true);
 }
 
-int prepare_netns() {
+int prepare_netns(const pid_t child_pid) {
   int status = 0;
-  const int sock_fd = create_socket(AF_NETLINK, SOCK_RAW | SOCK_CLOEXEC, NETLINK_ROUTE);
+  const int sock_fd = create_netlink_route_socket();
 
-  status = create_veth(sock_fd, "kostak0", "kostak1");
+  status = create_veth(sock_fd, "kostak0", "kostak1", child_pid);
 
   close(sock_fd);
 

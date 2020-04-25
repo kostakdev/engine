@@ -8,6 +8,7 @@ static size_t PAYLOAD_MAX = 1024;
 int addattr_l(struct nlmsghdr *n, int maxlen, __u16 type, const void *data, __u16 alen);
 struct rtattr* addattr_nest(struct nlmsghdr *n, int maxlen, __u16 type);
 void addattr_nest_end(struct nlmsghdr *n, struct rtattr *);
+void* reserve_space(struct nlmsghdr *n, int maxlen, size_t sz);
 
 static inline int addattr_uint32(struct nlmsghdr *n, int maxlen, __u16 type, 
                                  const uint32_t v) 
@@ -34,6 +35,10 @@ static inline int create_socket(int domain, int type, int protocol)
   }
 
   return sock_fd;
+}
+
+static inline int create_netlink_route_socket() {
+  return create_socket(AF_NETLINK, SOCK_RAW | SOCK_CLOEXEC, NETLINK_ROUTE);
 }
 
 int send_nlmsg(const int sock_fd, struct nlmsghdr *n, const bool ack);
