@@ -5,6 +5,16 @@
 
 static size_t PAYLOAD_MAX = 1024;
 
+struct nl_req {
+  struct nlmsghdr n;
+  union {
+    struct ifinfomsg i;
+    struct ifaddrmsg a;
+    struct rtmsg r;
+    struct nfgenmsg f;
+  };
+};
+
 int addattr_l(struct nlmsghdr *n, int maxlen, __u16 type, const void *data, __u16 alen);
 struct rtattr* addattr_nest(struct nlmsghdr *n, int maxlen, __u16 type);
 void addattr_nest_end(struct nlmsghdr *n, struct rtattr *);
