@@ -41,6 +41,7 @@ static inline int create_netlink_route_socket() {
   return create_socket(AF_NETLINK, SOCK_RAW | SOCK_CLOEXEC, NETLINK_ROUTE);
 }
 
+int check_response(int sock_fd);
 int send_nlmsg(const int sock_fd, struct nlmsghdr *n, const bool ack);
 
 

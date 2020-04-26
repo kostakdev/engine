@@ -90,7 +90,7 @@ static ssize_t read_response(int fd, struct msghdr *msg, char **response)
   return resp_len;
 }
 
-static int check_response(int sock_fd)
+int check_response(int sock_fd)
 {
   struct iovec iov;
 
