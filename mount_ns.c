@@ -1,7 +1,8 @@
 #include "common.h"
 #include "mount_ns.h"
 
-static inline int mount_proc() {
+static inline int mount_proc() 
+{
   int e;
   if (-1 == (e = mkdir("/proc", 0555))) {
     if (EEXIST == errno) {
@@ -20,7 +21,8 @@ static inline int mount_proc() {
   return 0;
 }
 
-int change_root(const char *newroot) {
+int change_root(const char *newroot) 
+{
   if (-1 == mount("", "/", "",
             MS_REC
             | MS_SLAVE,
