@@ -10,6 +10,9 @@ add_compile_options(-Wall -Wextra -pedantic -Werror)
 add_compile_options(-ffile-prefix-map=../src/=)
 
 set(LOG_SOURCES ${PROJECT_SOURCE_DIR}/logc/src/log.c)
-add_library(logc STATIC ${LOG_SOURCES})
+add_library(rxilogc STATIC ${LOG_SOURCES})
+
+set(MAP_SOURCES ${PROJECT_SOURCE_DIR}/rximap/src/map.c)
+add_library(rximap STATIC ${MAP_SOURCES})
 
 add_subdirectory(src)
