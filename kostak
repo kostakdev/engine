@@ -1,0 +1,8 @@
+#!/bin/sh
+
+if test -x ./build/bin/kostak; then
+  ./build/bin/kostak "$@"
+else
+  echo >&2 "kostak not found, please build first"
+  exit -1
+fi
