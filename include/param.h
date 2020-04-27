@@ -4,6 +4,13 @@
 #include "common.h"
 #include "env.h"
 
+struct port_map_entry {
+  uint16_t source_port;
+  uint16_t dest_port;
+};
+
+typedef struct port_map_entry port_map_entry_t;
+
 struct exec_param {
   char **argv;
   char *program_name;
