@@ -171,3 +171,54 @@ int send_nlmsg(int sock_fd, struct nlmsghdr *n, const bool ack)
 
   return status;
 }
+
+int parse_addrv4(const char *addr, uint32_t *ret, uint32_t *bitlen) {
+  int i;
+  *ret = 0;
+  uint8_t *buf = (uint8_t *) ret;
+  if (NULL != bitlen) {
+    *bitlen = 24;
+  }
+  char *slash = strrchr(addr, '/');
+
+  if (NULL != slash) {
+    *slash = '\0';
+  }
+
+  for (i = 0; i < 4; ++i) {
+    unsigned long n;
+    char *dot;
+
+    n = strtoul(addr, &dot, 0);
+
+    if (n > 255) {
+      return -1;
+    }
+
+    if (dot == addr) {
+      return -1;
+    }
+
+    buf[i] = n;
+
+    if ('\0' == *dot) {
+      break;
+    }
+
+    if (3 == i || '.' != *dot) {
+      return -1;
+    }
+
+    addr = dot + 1;
+
+  }
+
+  if (NULL != slash) {
+    *slash = '/';
+    if (NULL != bitlen) {
+      *bitlen = strtoul(slash + 1, NULL, 0);
+    }
+  }
+
+  return 0;
+}

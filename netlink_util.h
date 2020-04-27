@@ -19,6 +19,7 @@ int addattr_l(struct nlmsghdr *n, int maxlen, __u16 type, const void *data, __u1
 struct rtattr* addattr_nest(struct nlmsghdr *n, int maxlen, __u16 type);
 void addattr_nest_end(struct nlmsghdr *n, struct rtattr *);
 void* reserve_space(struct nlmsghdr *n, int maxlen, size_t sz);
+int parse_addrv4(const char *addr, uint32_t *ret, uint32_t *bitlen);
 
 static inline int addattr_uint32(struct nlmsghdr *n, int maxlen, __u16 type, 
                                  const uint32_t v) 
@@ -30,6 +31,12 @@ static inline int addattr_uint16(struct nlmsghdr *n, int maxlen, __u16 type,
                                  const uint16_t v)
 {
   return addattr_l(n, maxlen, type, &v, sizeof(uint16_t));
+}
+
+static inline int addattr_uint8(struct nlmsghdr *n, int maxlen, __u16 type,
+                                 const uint8_t v)
+{
+  return addattr_l(n, maxlen, type, &v, sizeof(uint8_t));
 }
 
 static inline int addattr_string(struct nlmsghdr *n, int maxlen, __u16 type, const char *s)
