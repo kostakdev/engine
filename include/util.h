@@ -3,12 +3,13 @@
 
 /* 
  * Simple string tuple implementation
- * It's just an array of pascalstring
+ * It's just an array of NULL-delimited string
  */
 
 typedef struct strtuple {
   char *buf;
   char **bufarr;
+  
 } strtuple_t;
 
 #endif /* KOSTAK_UTIL_H */
