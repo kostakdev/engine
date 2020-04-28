@@ -2,7 +2,7 @@
 #define PARAM_H 1
 
 #include "common.h"
-#include "env.h"
+#include "util.h"
 
 struct exec_param {
   char **argv;
@@ -11,8 +11,9 @@ struct exec_param {
   int log_level;
   char *rootfs;
   char rootfs_mount_point[PATH_MAX];
-  env_var_t env;
-  env_var_t host_mounts;
+  ptr_vec_t env;
+  ptr_vec_t mounts;
+  ptr_vec_t port_maps;
 };
 
 typedef struct exec_param exec_param_t;

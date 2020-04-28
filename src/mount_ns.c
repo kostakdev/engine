@@ -1,5 +1,6 @@
 #include "common.h"
 #include "mount_ns.h"
+#include "util.h"
 
 static inline int mount_proc() 
 {
@@ -46,8 +47,25 @@ int host_mount(const char *host_mount, const char *target_mount)
   return 0;
 }
 
-int change_root(const char *newroot) 
+static int mount_mapping(const char *newroot, ptr_vec_t *mounts) 
 {
+  size_t i;
+  char target_fullpath[PATH_MAX];
+  for(i = 0; i < mounts->count; ++i) {
+    const char *mountmap = (const char*) mounts->ptrs[i];
+    char *colon = strchr(mountmap, ':');
+    *colon = '\0';
+    snprintf(target_fullpath, PATH_MAX, "%s/%s", newroot, colon + 1);
+    host_mount(mountmap, target_fullpath);
+    *colon = ':';
+  }
+
+  return i;
+}
+
+int change_root_and_mount(exec_param_t *param)
+{
+  const char *newroot = param->rootfs;
   if (-1 == mount("", "/", "",
             MS_REC
             | MS_SLAVE,
@@ -57,13 +75,13 @@ int change_root(const char *newroot)
     return -1;
   }
 
+  mount_mapping(param->rootfs, &param->mounts);
+
   char mount_point[] = "/tmp/kostak.rootfs.XXXXXX";
   if( NULL == mkdtemp(mount_point) ) {
     log_error("Error creating mount point at /tmp: %m");
     return -1;
   }
-
-
 
   log_debug("Created mount point at %s", mount_point);
 
@@ -82,13 +100,6 @@ int change_root(const char *newroot)
     log_error("Error creating mount point at %s: %m", put_old);
     umount2(mount_point, MNT_DETACH);
     rmdir(mount_point);
-    return -1;
-  }
-
-  char container_mountpoint[PATH_MAX];
-  snprintf(container_mountpoint, PATH_MAX, "%s/mnt", newroot);
-
-  if (-1 == host_mount("/home/vagrant/sources", container_mountpoint)) {
     return -1;
   }
 

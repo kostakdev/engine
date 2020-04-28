@@ -1,5 +1,4 @@
 #include "common.h"
-#include "env.h"
 #include "param.h"
 
 static char *const default_rootfs = "rootfs";
@@ -36,6 +35,12 @@ static inline void set_param_loglevel(exec_param_t *param, int new_log_level) {
   }
 }
 
+static const char *default_args[] = {
+  "PS1=\\u@\\h:\\w\\$ ",
+  "TERM=screen",
+  "PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin",
+};
+
 void parse_arg(int argc, char **argv, exec_param_t *param)
 {
   if (argc < 2) {
@@ -45,17 +50,17 @@ void parse_arg(int argc, char **argv, exec_param_t *param)
 
   int c;
   int option_index = 0;
-  static const char *opt_short_string = "hu:vdtr:e:";
+  static const char *opt_short_string = "hu:vdtr:e:p:m:";
 
   param->log_level = LOG_WARN;
   param->utsname = default_hostname;
   param->rootfs = default_rootfs;
 
-  init_env_buf(&param->env);
-
-  add_env(&param->env, "PS1=\\u@\\h:\\w\\$ ");
-  add_env(&param->env, "TERM=screen");
-  add_env(&param->env, "PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin");
+  init_ptr_vec(&param->env, (void**) default_args, 
+    sizeof(default_args) / sizeof(const char*));
+  
+  init_ptr_vec(&param->port_maps, NULL ,0);
+  init_ptr_vec(&param->mounts, NULL, 0);
   
   while( -1 != (c = getopt_long(argc, argv, opt_short_string, long_options, &option_index))) {
     switch(c) {
@@ -80,11 +85,25 @@ void parse_arg(int argc, char **argv, exec_param_t *param)
         break;
       case 'e':
         if (NULL != strchr(optarg, '=')) {
-          add_env(&param->env, optarg);
+          add_ptr(&param->env, optarg);
         } else {
           log_debug("Cannot add '%s' as environment variable", optarg);
         }
         break;
+      case 'p':
+        if (NULL != strchr(optarg, ':')) {
+          add_ptr(&param->port_maps, optarg);
+        } else {
+          log_debug("%s is not a port mapping syntax", optarg);
+        }
+        break;
+      case 'm':
+        if (NULL != strchr(optarg, ':')) {
+          add_ptr(&param->mounts, optarg);
+        } else {
+          log_debug("%s is not a volume mapping syntax", optarg);
+        }
+        break; 
       case '?':
         print_usage();
         exit(EXIT_FAILURE);

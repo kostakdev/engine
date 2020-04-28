@@ -1,14 +1,17 @@
 #include "common.h"
 #include "util.h"
 
-void init_ptr_vec(ptr_vec_t *vec)
+void init_ptr_vec(ptr_vec_t *vec, void **init_values, const size_t count)
 {
   memset(vec, 0, sizeof(ptr_vec_t));
-
   vec->ptrs = mmap(0, INIT_SIZE * sizeof(void*), PROT_WRITE | PROT_READ, 
     MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);  
   vec->cap = INIT_SIZE;
-  vec->count = 0;
+  
+  if (init_values != NULL && count > 0) {
+    memmove(vec->ptrs, init_values, count * sizeof(void*));
+    vec->count = count;
+  }
 }
 
 int add_ptr(ptr_vec_t *vec, void *ptr)

@@ -16,11 +16,11 @@ int child_exec(void *stuff) {
     log_warn("Error changing hostname: %m");
   }
 
-  if (-1 == change_root(params->rootfs)) {
+  if (-1 == change_root_and_mount(params)) {
     return EXIT_FAILURE;
   }
 
-  if (-1 == execve(params->program_name, params->argv, params->env.bufarr)) {
+  if (-1 == execve(params->program_name, params->argv, (char * const *) params->env.ptrs)) {
     PANIC("Error executing %s: %m", params->argv[0]);
   }
 
