@@ -2,7 +2,6 @@
 #include "env.h"
 #include "param.h"
 
-
 static char *const default_rootfs = "rootfs";
 static char *const default_hostname = "kostak";
 

@@ -21,6 +21,31 @@ static inline int mount_proc()
   return 0;
 }
 
+int host_mount(const char *host_mount, const char *target_mount)
+{
+  char host_real_path[PATH_MAX];
+  char target_real_path[PATH_MAX];
+
+  if (NULL == realpath(host_mount, host_real_path)) {
+    log_error("Cannot find a real path for %s: %m", host_mount);
+    return -1;
+  }
+
+  if (NULL == realpath(target_mount, target_real_path)) {
+    log_error("Cannot find a real path for %s: %m", target_mount);
+    return -1;
+  }
+
+  log_debug("Attempting mounting %s to %s", host_real_path, target_real_path);
+
+  if (-1 == mount(host_real_path, target_real_path, "", MS_REC|MS_BIND, NULL)) {
+    log_error("Failed mounting host path");
+    return -1;
+  }
+
+  return 0;
+}
+
 int change_root(const char *newroot) 
 {
   if (-1 == mount("", "/", "",
@@ -37,6 +62,8 @@ int change_root(const char *newroot)
     log_error("Error creating mount point at /tmp: %m");
     return -1;
   }
+
+
 
   log_debug("Created mount point at %s", mount_point);
 
@@ -55,6 +82,13 @@ int change_root(const char *newroot)
     log_error("Error creating mount point at %s: %m", put_old);
     umount2(mount_point, MNT_DETACH);
     rmdir(mount_point);
+    return -1;
+  }
+
+  char container_mountpoint[PATH_MAX];
+  snprintf(container_mountpoint, PATH_MAX, "%s/mnt", newroot);
+
+  if (-1 == host_mount("/home/vagrant/sources", container_mountpoint)) {
     return -1;
   }
 

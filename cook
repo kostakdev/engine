@@ -5,7 +5,7 @@ set -e
 command -v cmake > /dev/null || { echo >&2 "To build kostak we need CMake. Aborting"; exit 1; }
 command -v gcc > /dev/null || { echo >&2 "You don't even have compiler. Please install gcc"; exit 1; }
 
-test -n "${OSTYPE}" && test "${OSTYPE}" == "linux-gnu" || { echo >&2 "Can only be compiled on Linux machine"; exit 1; }
+# test -n "${OSTYPE}" && test "${OSTYPE}" == "linux-gnu" || { echo >&2 "Can only be compiled on Linux machine"; exit 1; }
 
 EXTRA_DEFS=""
 

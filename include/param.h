@@ -12,6 +12,7 @@ struct exec_param {
   char *rootfs;
   char rootfs_mount_point[PATH_MAX];
   env_var_t env;
+  env_var_t host_mounts;
 };
 
 typedef struct exec_param exec_param_t;
