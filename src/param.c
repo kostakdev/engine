@@ -7,11 +7,11 @@ static char *const default_hostname = "kostak";
 static void print_usage() {
   fprintf(stderr, 
     "Usage:\tkostak [-h] [-u <hostname>] [-d -t -v] [-r rootfs] [-p port_mapping] [-e env_vars] [-m mount_mapping] <program_name>\n"
-    "\t-h\t\tshow help\n"
-    "\t-u <hostname>\tcustom hostname\n"
-    "\t-r rootfs\n"
-    "\t-p <dest>:<host> port\tport mapping from dest to host \n"
-    "\t-m <host_mount>:<container_mount> mounting host directory to container\n"
+    "\t-h\t\t\tshow help\n"
+    "\t-u <hostname>\t\tcustom hostname\n"
+    "\t-r rootfs\t\tspecify the root filesystem\n"
+    "\t-p <dest>:<host>\tport mapping from dest to host \n"
+    "\t-m <hostdir>:<mount>\tmounting host directory to container\n"
     "\n"
     "Verbosity:\n"
     "\t-d turn on debug mode\n"
