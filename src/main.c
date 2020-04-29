@@ -72,7 +72,7 @@ int main(int argc, char **argv) {
 
   log_debug("Started, parent %ld, child %ld", (long) getpid(), (long) child_pid);
 
-  if (-1 == prepare_netns(child_pid)) {
+  if (-1 == prepare_netns(child_pid, &params)) {
     PANIC("Error preparing network namespace: %m");
   }
   if (-1 == waitpid(child_pid, NULL, 0)) {

@@ -2,6 +2,7 @@
 #define NET_ETH 1
 #include "common.h"
 
-int prepare_netns(const pid_t child_pid);
+struct exec_param;
+int prepare_netns(const pid_t child_pid, const struct exec_param *param);
 
 #endif /* NET_ETH */

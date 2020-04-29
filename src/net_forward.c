@@ -135,7 +135,7 @@ int create_masq_rule(const char *table_name, const char *chain_name,
 }
 
 int create_tcp_portforward_rule(const char *table_name, const char *chain_name,
-  const __u16 dest_port, const char *dest_addr, __attribute__((unused)) const __u16 target_port, 
+  const __u16 dest_port, const char *dest_addr, const __u16 target_port, 
   void *buf, void **nextbuf)
 {
   uint32_t addr_i = 0;

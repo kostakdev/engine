@@ -2,6 +2,7 @@
 #include "net_eth.h"
 #include "netlink_util.h"
 #include "net_forward.h"
+#include "param.h"
 
 static const unsigned int UNUSED_IFI_CHANGE = 0xFFFFFFFFu;
 
@@ -123,7 +124,7 @@ static int assign_address(const int sock_fd, const char *ifname, const char *add
   return send_nlmsg(sock_fd, (struct nlmsghdr *) buffer, true);
 }
 
-static int add_nat(int sock_fd) {
+static int add_nat(int sock_fd, const exec_param_t *param) {
   uint8_t buf[PAYLOAD_MAX];
   void *next = buf;
 
@@ -134,8 +135,22 @@ static int add_nat(int sock_fd) {
   create_nat_chain("kostak", "postrouting", NAT_POSTROUTING, next, &next);
   create_nat_chain("kostak", "output_nat", NAT_OUTPUT, next, &next);
   create_masq_rule("kostak", "postrouting", next, &next);
-  create_tcp_portforward_rule("kostak", "prerouting", 8888, "10.0.22.2", 8000, next, &next);
-  create_tcp_portforward_rule("kostak", "output_nat", 8888, "10.0.22.2", 8000, next, &next);
+
+  if (param->port_maps.count > 0) {
+    size_t i;
+
+    for (i = 0; i < param->port_maps.count; ++i) {
+      const char *item = param->port_maps.ptrs[i];
+      char *colon;
+      const __u16 source = (__u16) strtoul(item, &colon, 0);
+      const __u16 target = (__u16) strtoul(colon + 1, NULL, 0);
+
+      log_debug("Mapping port %hu to %hu", source, target);
+
+      create_tcp_portforward_rule("kostak", "prerouting", source, "10.0.22.2", target, next, &next);
+      create_tcp_portforward_rule("kostak", "output_nat", source, "10.0.22.2", target, next, &next);
+    }
+  }
   end_nf_batch(next, &next);
 
   const size_t payload_size = (uint8_t *)next - buf;
@@ -236,7 +251,7 @@ static inline int enable_local_route(const char *ifname) {
   return sysctl_on_off(filepath, true);
 }
 
-int prepare_netns(const pid_t child_pid) {
+int prepare_netns(const pid_t child_pid, const exec_param_t *param) {
   int status = 0;
   const int sock_fd = create_netlink_route_socket();
   const int cur_netns_fd = get_netns_fd(getpid());
@@ -295,7 +310,7 @@ int prepare_netns(const pid_t child_pid) {
 
   const int netfilter_sock = create_socket(PF_NETLINK, SOCK_RAW | SOCK_CLOEXEC, NETLINK_NETFILTER);
 
-  add_nat(netfilter_sock);
+  add_nat(netfilter_sock, param);
 
   close(netfilter_sock);
 
