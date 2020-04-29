@@ -7,10 +7,14 @@ set(SOURCES main.c child.c
             netlink_util.c net_eth.c 
             net_forward.c util.c)
 
-add_executable(kostak ${SOURCES})
+add_compile_options(-Wall -Wextra -pedantic -Werror)
+add_library(kostak_core STATIC ${SOURCES})
+add_executable(kostak main.c)
 
 if(KOSTAK_STATIC)
 target_link_libraries(kostak -static)
 endif(KOSTAK_STATIC)
 
-target_link_libraries(kostak rxilogc rximap)
+
+target_link_libraries(kostak_core rxilogc)
+target_link_libraries(kostak rxilogc rximap kostak_core)

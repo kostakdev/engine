@@ -181,10 +181,6 @@ int parse_addrv4(const char *addr, uint32_t *ret, uint32_t *bitlen) {
   }
   char *slash = strrchr(addr, '/');
 
-  if (NULL != slash) {
-    *slash = '\0';
-  }
-
   for (i = 0; i < 4; ++i) {
     unsigned long n;
     char *dot;
@@ -201,7 +197,7 @@ int parse_addrv4(const char *addr, uint32_t *ret, uint32_t *bitlen) {
 
     buf[i] = n;
 
-    if ('\0' == *dot) {
+    if ('\0' == *dot || '/' == *dot) {
       break;
     }
 
@@ -214,7 +210,6 @@ int parse_addrv4(const char *addr, uint32_t *ret, uint32_t *bitlen) {
   }
 
   if (NULL != slash) {
-    *slash = '/';
     if (NULL != bitlen) {
       *bitlen = strtoul(slash + 1, NULL, 0);
     }
