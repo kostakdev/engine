@@ -23,7 +23,8 @@ int create_masq_rule(const char *table_name, const char *chain_name,
                         void *buf, void **nextbuf);
 
 int create_tcp_portforward_rule(const char *table_name, const char *chain_name,
-  const __u16 dest_port, const char *dest_addr, void *buf, void **nextbuf);
+  const __u16 dest_port, const char *target_addr, const __u16 target_port, 
+  void *buf, void **nextbuf);
 
 
 #endif /* NET_FORWARD */

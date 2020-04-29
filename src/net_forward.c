@@ -135,7 +135,8 @@ int create_masq_rule(const char *table_name, const char *chain_name,
 }
 
 int create_tcp_portforward_rule(const char *table_name, const char *chain_name,
-  const __u16 dest_port, const char *dest_addr, void *buf, void **nextbuf)
+  const __u16 dest_port, const char *dest_addr, __attribute__((unused)) const __u16 target_port, 
+  void *buf, void **nextbuf)
 {
   uint32_t addr_i = 0;
   if (-1 == parse_addrv4(dest_addr, &addr_i, NULL)) {
@@ -226,17 +227,32 @@ int create_tcp_portforward_rule(const char *table_name, const char *chain_name,
 
   // * forward to */
   /* 
-   * load imm (addr) => r1
+   * load imm (addr) => r2
    */
   struct rtattr *elem_imm_addr = addattr_nest(n, PAYLOAD_MAX, NLA_F_NESTED | NFTA_LIST_ELEM);
   addattr_string(n, PAYLOAD_MAX, NFTA_EXPR_NAME, "immediate");
   struct rtattr *imm_addr_expr_data = addattr_nest(n, PAYLOAD_MAX, NLA_F_NESTED | NFTA_EXPR_DATA);
-  addattr_uint32(n, PAYLOAD_MAX, NFTA_IMMEDIATE_DREG, htonl(1));
+  addattr_uint32(n, PAYLOAD_MAX, NFTA_IMMEDIATE_DREG, htonl(2));
   struct rtattr *imm_addr_value = addattr_nest(n, PAYLOAD_MAX, NLA_F_NESTED | NFTA_IMMEDIATE_DATA);
   addattr_uint32(n, PAYLOAD_MAX, NFTA_DATA_VALUE, addr_i);
   addattr_nest_end(n, imm_addr_value); 
   addattr_nest_end(n, imm_addr_expr_data);
   addattr_nest_end(n, elem_imm_addr);
+
+  // * forward to */
+  /* 
+   * load imm (port) => r1
+   */
+  struct rtattr *elem_imm_port = addattr_nest(n, PAYLOAD_MAX, NLA_F_NESTED | NFTA_LIST_ELEM);
+  addattr_string(n, PAYLOAD_MAX, NFTA_EXPR_NAME, "immediate");
+  struct rtattr *imm_port_expr_data = addattr_nest(n, PAYLOAD_MAX, NLA_F_NESTED | NFTA_EXPR_DATA);
+  addattr_uint32(n, PAYLOAD_MAX, NFTA_IMMEDIATE_DREG, htonl(1));
+  struct rtattr *imm_port_value = addattr_nest(n, PAYLOAD_MAX, NLA_F_NESTED | NFTA_IMMEDIATE_DATA);
+  addattr_uint16(n, PAYLOAD_MAX, NFTA_DATA_VALUE, htons(target_port));
+  addattr_nest_end(n, imm_port_value); 
+  addattr_nest_end(n, imm_port_expr_data);
+  addattr_nest_end(n, elem_imm_port);
+  
 
   /* DNAT */
   /* dnat_ipv4 r1 */
@@ -245,7 +261,8 @@ int create_tcp_portforward_rule(const char *table_name, const char *chain_name,
   struct rtattr *elem_dnat_expr_data = addattr_nest(n, PAYLOAD_MAX, NLA_F_NESTED | NFTA_EXPR_DATA); 
   addattr_uint32(n, PAYLOAD_MAX, NFTA_NAT_TYPE, htonl(NFT_NAT_DNAT));
   addattr_uint32(n, PAYLOAD_MAX, NFTA_NAT_FAMILY, htonl(NFPROTO_IPV4));
-  addattr_uint32(n, PAYLOAD_MAX, NFTA_NAT_REG_ADDR_MIN, htonl(1));
+  addattr_uint32(n, PAYLOAD_MAX, NFTA_NAT_REG_ADDR_MIN, htonl(2));
+  addattr_uint32(n, PAYLOAD_MAX, NFTA_NAT_REG_PROTO_MIN, htonl(1));
   addattr_nest_end(n, elem_dnat_expr_data);
   addattr_nest_end(n, elem_dnat);
   addattr_nest_end(n, rule);

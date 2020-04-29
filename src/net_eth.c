@@ -134,8 +134,8 @@ static int add_nat(int sock_fd) {
   create_nat_chain("kostak", "postrouting", NAT_POSTROUTING, next, &next);
   create_nat_chain("kostak", "output_nat", NAT_OUTPUT, next, &next);
   create_masq_rule("kostak", "postrouting", next, &next);
-  create_tcp_portforward_rule("kostak", "prerouting", 8000, "10.0.22.2", next, &next);
-  create_tcp_portforward_rule("kostak", "output_nat", 8000, "10.0.22.2", next, &next);
+  create_tcp_portforward_rule("kostak", "prerouting", 8888, "10.0.22.2", 8000, next, &next);
+  create_tcp_portforward_rule("kostak", "output_nat", 8888, "10.0.22.2", 8000, next, &next);
   end_nf_batch(next, &next);
 
   const size_t payload_size = (uint8_t *)next - buf;

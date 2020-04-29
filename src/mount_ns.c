@@ -75,8 +75,6 @@ int change_root_and_mount(exec_param_t *param)
     return -1;
   }
 
-  mount_mapping(param->rootfs, &param->mounts);
-
   char mount_point[] = "/tmp/kostak.rootfs.XXXXXX";
   if( NULL == mkdtemp(mount_point) ) {
     log_error("Error creating mount point at /tmp: %m");
@@ -102,6 +100,8 @@ int change_root_and_mount(exec_param_t *param)
     rmdir(mount_point);
     return -1;
   }
+
+  mount_mapping(mount_point, &param->mounts);
 
   log_debug("%s created for putting old rootfs", put_old);
 
