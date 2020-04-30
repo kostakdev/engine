@@ -3,7 +3,7 @@
 
 #include "common.h"
 
-static const size_t PAYLOAD_MAX = 2048;
+enum { PAYLOAD_MAX = 2048 };
 
 struct nl_req {
   struct nlmsghdr n;
