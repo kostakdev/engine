@@ -2,18 +2,10 @@
 #define COMMON_H 1
 
 #define _GNU_SOURCE 1
-#include <arpa/inet.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <getopt.h>
 #include <libgen.h>
-#include <linux/limits.h>
-#include <linux/netfilter.h>
-#include <linux/netfilter/nfnetlink.h>
-#include <linux/netfilter/nf_tables.h>
-#include <linux/netlink.h>
-#include <linux/rtnetlink.h>
-#include <linux/veth.h>
 #include <net/if.h>
 #include <sched.h>
 #include <signal.h>
@@ -36,6 +28,15 @@
 #include <time.h>
 #include <unistd.h>
 
+#include <linux/limits.h>
+#include <linux/netfilter.h>
+#include <linux/netfilter/nfnetlink.h>
+#include <linux/netfilter/nf_tables.h>
+#include <linux/netlink.h>
+#include <linux/rtnetlink.h>
+#include <linux/veth.h>
+
+#include "compat.h"
 #include "log.h"
 
 #define KBYTES (1024)

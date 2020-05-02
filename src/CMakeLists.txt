@@ -12,6 +12,7 @@ add_library(kostak_core STATIC ${SOURCES})
 add_executable(kostak main.c)
 
 if(KOSTAK_STATIC)
+add_compile_options(-static)
 target_link_libraries(kostak -static)
 endif(KOSTAK_STATIC)
 
