@@ -7,7 +7,7 @@ elseif(UNIX OR APPLE)
     set(UTIL_SEARCH_CMD which)
 endif()
 
-set(TOOLCHAIN_PREFIX x86_64-kostak-linux-musl-)
+set(TOOLCHAIN_PREFIX arm-kostak-linux-musleabihf-)
 
 execute_process(
   COMMAND ${UTIL_SEARCH_CMD} ${TOOLCHAIN_PREFIX}gcc
@@ -16,9 +16,9 @@ execute_process(
 )
 
 # TODO make this findable
-# set (KOSTAK_TOOLCHAIN_DIR /Users/lynxluna/Projects/ykode/kostak/sdk/x86_64-kostak-linux-musl/bin)
+# set (KOSTAK_TOOLCHAIN_DIR /Users/lynxluna/Projects/ykode/kostak/sdk/arm-kostak-linux-musleabihf/bin)
 
-get_filename_component(KOSTAK_TOOLCHAIN_DIR ${BINUTILS_PATH} DIRECTORY)
+# get_filename_component(KOSTAK_TOOLCHAIN_DIR ${BINUTILS_PATH} DIRECTORY)
 # Without that flag CMake is not able to pass test compilation check
 if (${CMAKE_VERSION} VERSION_EQUAL "3.6.0" OR ${CMAKE_VERSION} VERSION_GREATER "3.6")
     set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
@@ -33,7 +33,7 @@ set(CMAKE_CXX_COMPILER ${TOOLCHAIN_PREFIX}g++)
 set(CMAKE_OBJCOPY ${KOSTAK_TOOLCHAIN_DIR}/${TOOLCHAIN_PREFIX}objcopy CACHE INTERNAL "objcopy tool")
 set(CMAKE_SIZE_UTIL ${KOSTAK_TOOLCHAIN_DIR}/${TOOLCHAIN_PREFIX}size CACHE INTERNAL "size tool")
 
-set(CMAKE_SYSROOT ${KOSTAK_TOOLCHAIN_DIR}/../x86_64-kostak-linux-musl/sysroot)
+set(CMAKE_SYSROOT ${KOSTAK_TOOLCHAIN_DIR}/../arm-kostak-linux-musleabihf/sysroot)
 set(CMAKE_FIND_ROOT_PATH ${BINUTILS_PATH})
 set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
 set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
