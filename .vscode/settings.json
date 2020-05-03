@@ -1,3 +1,7 @@
 {
   "C_Cpp.default.configurationProvider": "vector-of-bool.cmake-tools",
+  "cmake.configureSettings": {
+    "KOSTAK_TOOLCHAIN_DIR": "/Users/lynxluna/Projects/ykode/kostak/sdk/x86_64-kostak-linux-musl/bin",
+    "KOSTAK_TARGET_TRIPLET": "x86_64-kostak-linux-musl"
+  }
 }
