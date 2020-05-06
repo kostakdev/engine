@@ -16,6 +16,9 @@ add_compile_options(-static)
 target_link_libraries(kostak -static)
 endif(KOSTAK_STATIC)
 
+if(KOSTAK_BIG_STACK)
+add_compile_options(-DKOSTAK_BIG_STACK)
+endif(KOSTAK_BIG_STACK)
 
 target_link_libraries(kostak_core rxilogc)
 target_link_libraries(kostak rxilogc rximap kostak_core)

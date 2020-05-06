@@ -124,6 +124,11 @@ int change_root_and_mount(exec_param_t *param)
     return -1;
   }
 
+  if (-1 == mount("tmpfs", "/tmp", "tmpfs", 0, "")) {
+    log_error("Failure on mounting tmpfs: %m");
+    return -1;
+  }
+
   char base_old_dir[] = "put.old.XXXXXX";
   char *old_dir = basename(put_old);
 

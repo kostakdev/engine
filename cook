@@ -11,12 +11,12 @@ PROCESSOR=$(uname -m)
 
 TARGET_TUPLE="x86_64-kostak-linux-musl"
 
-EXTRA_DEFS="-DKOSTAK_TARGET_TRIPLET=${TARGET_TUPLE}"
+EXTRA_DEFS="--no-warn-unused-cli -DKOSTAK_TARGET_TRIPLET=${TARGET_TUPLE}"
 
 if test "x${OSNAME}" != "xLinux"
 then
   echo "The build computer is not linux, cross-compiling"
-  EXTRA_DEFS="${EXTRA_DEFS} -DKOSTAK_STATIC=1"
+  EXTRA_DEFS="${EXTRA_DEFS} -DKOSTAK_STATIC=1 -DKOSTAK_BIG_STACK=1"
   EXTRA_DEFS="${EXTRA_DEFS} -DCMAKE_TOOLCHAIN_FILE=../cmake/toolchain-kostak-linux-amd64.cmake"
 fi
 

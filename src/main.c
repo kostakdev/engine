@@ -31,6 +31,8 @@ static bool check_kernel_version() {
   return verdict;
 }
 
+/* Set the stack size to musl's limit */
+#define KOSTAK_LIMITED_STACK_SIZE (80 * KBYTES)
 
 int main(int argc, char **argv) {
   
@@ -44,12 +46,14 @@ int main(int argc, char **argv) {
     exit(EXIT_FAILURE);
   }
 
-  struct rlimit lim;
-  static size_t child_stack_size = 1024 * KBYTES;
+  static size_t child_stack_size = KOSTAK_LIMITED_STACK_SIZE;
 
+#ifdef KOSTAK_BIG_STACK
+  struct rlimit lim;
   if (0 == getrlimit(RLIMIT_STACK, &lim)) {
     child_stack_size = lim.rlim_cur / 4;
   }
+#endif
 
   log_debug("Stack Size Allocated: %ld KB", child_stack_size / KBYTES);
 
