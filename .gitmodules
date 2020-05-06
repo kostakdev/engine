@@ -1,6 +1,3 @@
 [submodule "logc"]
 	path = logc
 	url = https://github.com/rxi/log.c.git
-[submodule "rximap"]
-	path = rximap
-	url = https://github.com/rxi/map.git
