@@ -89,8 +89,20 @@ int main(int argc, char **argv) {
   if (-1 == prepare_netns(child_pid, &params)) {
     PANIC("Error preparing network namespace: %m");
   }
-  if (-1 == waitpid(child_pid, NULL, 0)) {
+  int child_wstatus;
+  if (-1 == waitpid(child_pid, &child_wstatus, 0)) {
     PANIC("Error when waiting child process: %m\n");
+  }
+
+  if (!WIFEXITED(child_wstatus)) {
+    PANIC("Child Failed status=%ld, !WIFEXITED!", child_wstatus);
+  }
+
+  int child_status = WEXITSTATUS(child_wstatus);
+
+  if (child_status != 0) {
+    log_fatal("Child Failed with status=%d", child_status);
+    return child_status;
   }
 
   log_debug("Process %ld terminated", (long) child_pid);
