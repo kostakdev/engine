@@ -41,29 +41,47 @@ static inline size_t aligned_size(const size_t sz, const size_t alignment) {
   return ((sz + (alignment - 1)) & ~(alignment -1));
 } 
 
-int main(int argc, char **argv) {
+static ssize_t allocate_heap_stack(const size_t stack_size, 
+                               const size_t heap_size,
+                               void **base, 
+                               void **heap_base) 
+{
   const size_t page_size = sysconf(_SC_PAGE_SIZE);
-  const size_t HEAP_STACK_SIZE = aligned_size(KOSTAK_LIMITED_STACK_SIZE + UMM_MALLOC_CFG_HEAP_SIZE, page_size);
-  uint8_t *heap_stack =  mmap(NULL, HEAP_STACK_SIZE, PROT_READ | PROT_WRITE, 
-      MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+  const size_t aligned_stack_size = aligned_size(stack_size, page_size);
+  const size_t aligned_heap_size = aligned_size(heap_size, page_size);
+  
+  uint8_t *base_addr = mmap(NULL, aligned_stack_size + aligned_heap_size, PROT_READ | PROT_WRITE,
+    MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 
-  UMM_MALLOC_CFG_HEAP_ADDR = heap_stack + KOSTAK_LIMITED_STACK_SIZE;
-  uint8_t *stack_top = UMM_MALLOC_CFG_HEAP_ADDR;
-
-  if (NULL == heap_stack) {
-    PANIC("Error allocating space for heap using mmap: %m");
-  } else {
-    log_debug("Allocated heap and stack space: %lu at address %p", 
-        (unsigned long) HEAP_STACK_SIZE,
-        heap_stack);
+  if (NULL == base_addr) {
+    log_error("Failure allocating stack and heap: %m");
+    return -1;
   }
-   
+  *base = (void*) base_addr; 
+  *heap_base = (void*) (base_addr + aligned_stack_size);
+  return aligned_stack_size + aligned_heap_size;
+}
+
+int main(int argc, char **argv) {
+  log_set_level(LOG_WARN);
+
+  uint8_t *stack;
+  ssize_t memsize;
+  
+  if (0 > (memsize = allocate_heap_stack(KOSTAK_LIMITED_STACK_SIZE, UMM_MALLOC_CFG_HEAP_SIZE,
+        (void**) &stack, (void**) &UMM_MALLOC_CFG_HEAP_ADDR))) 
+  {
+    return EXIT_FAILURE;
+  }
+
   exec_param_t params;
   memset(&params, 0, sizeof(exec_param_t));
   parse_arg(argc, argv, &params);
 
   log_set_level(params.log_level);
-  
+ 
+  log_debug("Allocated %lu as heap and stack: stack %p | heap %p", memsize, stack, UMM_MALLOC_CFG_HEAP_ADDR);
+
   if(!check_kernel_version()) {
     exit(EXIT_FAILURE);
   }
@@ -78,7 +96,8 @@ int main(int argc, char **argv) {
     | CLONE_NEWNET
     | CLONE_NEWUTS;
 
-  const pid_t child_pid = clone(child_exec, stack_top, clone_flags, (void*) &params);
+  /* bottom of heap = top of the stack */
+  const pid_t child_pid = clone(child_exec, UMM_MALLOC_CFG_HEAP_ADDR, clone_flags, (void*) &params);
 
   if (-1 == child_pid) {
     PANIC("Error when cloning: %m\n");
