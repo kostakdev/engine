@@ -14,6 +14,9 @@ struct exec_param {
   ptr_vec_t env;
   ptr_vec_t mounts;
   ptr_vec_t port_maps;
+
+  int in_pipe[2];
+  int out_pipe[2];
 };
 
 typedef struct exec_param exec_param_t;

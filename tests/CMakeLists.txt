@@ -11,7 +11,7 @@ include(CheckTypeSize)
 
 include_directories(${kostak_SOURCE_DIR}/include 
                     ${kostak_SOURCE_DIR}/logc/src
-                    ${kostak_SOURCE_DIR}/rximap/src)
+                    ${kostak_SOURCE_DIR}/umm_malloc/src)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/build/tests)
 

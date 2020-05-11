@@ -20,6 +20,18 @@ add_compile_options(-ffile-prefix-map=../src/=)
 set(LOG_SOURCES ${PROJECT_SOURCE_DIR}/logc/src/log.c)
 add_library(rxilogc STATIC ${LOG_SOURCES})
 
+set(UMM_MALLOC_SOURCEDIR ${PROJECT_SOURCE_DIR}/umm_malloc/src/)
+set(UMM_MALLOC_SOURCES
+    ${UMM_MALLOC_SOURCEDIR}/umm_info.c
+    ${UMM_MALLOC_SOURCEDIR}/umm_integrity.c
+    ${UMM_MALLOC_SOURCEDIR}/umm_malloc.c
+    ${UMM_MALLOC_SOURCEDIR}/umm_poison.c)
+
+add_library(umm_malloc STATIC ${UMM_MALLOC_SOURCES})
+target_include_directories(umm_malloc PRIVATE 
+  ${PROJECT_SOURCE_DIR}/include 
+  ${PROJECT_SOURCE_DIR}/logc/src)
+
 add_subdirectory(src)
 
 if (NOT CMAKE_CROSSCOMPILING)

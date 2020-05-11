@@ -1,3 +1,6 @@
 [submodule "logc"]
 	path = logc
 	url = https://github.com/rxi/log.c.git
+[submodule "umm_malloc"]
+	path = umm_malloc
+	url = https://github.com/rhempel/umm_malloc.git

@@ -34,8 +34,30 @@ static bool check_kernel_version() {
 /* Set the stack size to musl's limit */
 #define KOSTAK_LIMITED_STACK_SIZE (80 * KBYTES)
 
+const size_t UMM_MALLOC_CFG_HEAP_SIZE = (128 * KBYTES);
+void *UMM_MALLOC_CFG_HEAP_ADDR = NULL;
+
+static inline size_t aligned_size(const size_t sz, const size_t alignment) {
+  return ((sz + (alignment - 1)) & ~(alignment -1));
+} 
+
 int main(int argc, char **argv) {
-  
+  const size_t page_size = sysconf(_SC_PAGE_SIZE);
+  const size_t HEAP_STACK_SIZE = aligned_size(KOSTAK_LIMITED_STACK_SIZE + UMM_MALLOC_CFG_HEAP_SIZE, page_size);
+  uint8_t *heap_stack =  mmap(NULL, HEAP_STACK_SIZE, PROT_READ | PROT_WRITE, 
+      MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+
+  UMM_MALLOC_CFG_HEAP_ADDR = heap_stack + KOSTAK_LIMITED_STACK_SIZE;
+  uint8_t *stack_top = UMM_MALLOC_CFG_HEAP_ADDR;
+
+  if (NULL == heap_stack) {
+    PANIC("Error allocating space for heap using mmap: %m");
+  } else {
+    log_debug("Allocated heap and stack space: %lu at address %p", 
+        (unsigned long) HEAP_STACK_SIZE,
+        heap_stack);
+  }
+   
   exec_param_t params;
   memset(&params, 0, sizeof(exec_param_t));
   parse_arg(argc, argv, &params);
@@ -48,20 +70,8 @@ int main(int argc, char **argv) {
 
   static size_t child_stack_size = KOSTAK_LIMITED_STACK_SIZE;
 
-#ifdef KOSTAK_BIG_STACK
-  struct rlimit lim;
-  if (0 == getrlimit(RLIMIT_STACK, &lim)) {
-    child_stack_size = lim.rlim_cur / 4;
-  }
-#endif
-
   log_debug("Stack Size Allocated: %ld KB", child_stack_size / KBYTES);
-
-  uint8_t *stack = mmap(NULL, child_stack_size, PROT_READ | PROT_WRITE,
-    MAP_STACK | MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
-  
-  uint8_t *stack_top = stack + child_stack_size;
-
+ 
   const int clone_flags = SIGCHLD
     | CLONE_NEWNS
     | CLONE_NEWPID

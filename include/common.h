@@ -38,6 +38,7 @@
 
 #include "compat.h"
 #include "log.h"
+#include "umm_malloc.h"
 
 #define KBYTES (1024)
 
