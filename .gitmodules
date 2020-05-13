@@ -4,3 +4,6 @@
 [submodule "umm_malloc"]
 	path = umm_malloc
 	url = https://github.com/rhempel/umm_malloc.git
+[submodule "jsmn"]
+	path = jsmn
+	url = https://github.com/zserge/jsmn.git

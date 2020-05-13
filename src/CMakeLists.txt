@@ -1,6 +1,7 @@
 include_directories(${kostak_SOURCE_DIR}/include 
                     ${kostak_SOURCE_DIR}/logc/src
-                    ${kostak_SOURCE_DIR}/umm_malloc/src)
+                    ${kostak_SOURCE_DIR}/umm_malloc/src
+                    ${kostak_SOURCE_DIR}/jsmn)
 
 set(SOURCES main.c child.c 
             param.c mount_ns.c 
