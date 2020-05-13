@@ -1,3 +1,8 @@
+find_package(PkgConfig REQUIRED)
+
+pkg_check_modules(LIBSECCOMP REQUIRED libseccomp)
+pkg_check_modules(LIBCAP REQUIRED libcap)
+
 include_directories(${kostak_SOURCE_DIR}/include 
                     ${kostak_SOURCE_DIR}/logc/src
                     ${kostak_SOURCE_DIR}/umm_malloc/src
@@ -8,7 +13,7 @@ set(SOURCES main.c child.c
             netlink_util.c net_eth.c 
             net_forward.c util.c)
 
-add_compile_options(-Wall -Wextra -pedantic -Werror -fstack-protector-strong -fPIE)
+add_compile_options(-Wall -Wextra -pedantic -Werror -fstack-protector-strong)
 
 if (CMAKE_BUILD_TYPE STREQUAL Release OR CMAKE_BUILD_TYPE STREQUAL MinSizeRel)
   add_compile_options( -D__FORTIFY_SOURCE)
@@ -27,6 +32,8 @@ add_compile_options(-DKOSTAK_BIG_STACK)
 endif(KOSTAK_BIG_STACK)
 
 target_link_libraries(kostak_core rxilogc umm_malloc)
-target_link_libraries(kostak rxilogc umm_malloc kostak_core)
+target_link_libraries(kostak rxilogc umm_malloc kostak_core ${LIBCAP_LIBRARIES} ${LIBSECCOMP_LIBRARIES})
+target_include_directories(kostak PUBLIC ${LIBCAP_INCLUDE_DIRS} ${LIBSECCOMP_INCLUDE_DIRS})
+target_compile_options(kostak PUBLIC ${LIBCAP_CFLAGS_OTHER} ${LIBSECCOMP_CFLAGS_OTHER})
 
 set_property(TARGET kostak PROPERTY POSITION_INDEPENDENT_CODE ON)
