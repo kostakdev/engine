@@ -13,12 +13,10 @@ set(SOURCES main.c child.c
             netlink_util.c net_eth.c 
             net_forward.c util.c)
 
-add_compile_options(-Wall -Wextra -pedantic -Werror -fstack-protector-strong)
-
-if (CMAKE_BUILD_TYPE STREQUAL Release OR CMAKE_BUILD_TYPE STREQUAL MinSizeRel)
-  add_compile_options( -D__FORTIFY_SOURCE)
-endif ()
-
+add_compile_options(-Wall -Wextra -pedantic -Werror -fstack-protector-strong -fstack-clash-protection -fexceptions -pipe)
+if(CMAKE_BUILD_TYPE STREQUAL Release OR CMAKE_BUILD_TYPE STREQUAL MinSizeRel)
+  add_definitions(-D_FORTIFY_SOURCE=2)
+endif(CMAKE_BUILD_TYPE STREQUAL Release OR CMAKE_BUILD_TYPE STREQUAL MinSizeRel)
 add_library(kostak_core STATIC ${SOURCES})
 add_executable(kostak main.c)
 
@@ -35,5 +33,5 @@ target_link_libraries(kostak_core rxilogc umm_malloc)
 target_link_libraries(kostak rxilogc umm_malloc kostak_core ${LIBCAP_LIBRARIES} ${LIBSECCOMP_LIBRARIES})
 target_include_directories(kostak PUBLIC ${LIBCAP_INCLUDE_DIRS} ${LIBSECCOMP_INCLUDE_DIRS})
 target_compile_options(kostak PUBLIC ${LIBCAP_CFLAGS_OTHER} ${LIBSECCOMP_CFLAGS_OTHER})
-
 set_property(TARGET kostak PROPERTY POSITION_INDEPENDENT_CODE ON)
+target_link_options(kostak PUBLIC "LINKER:-z,now" "LINKER:-z,defs" "LINKER:-z,relro")
