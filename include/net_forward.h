@@ -15,6 +15,8 @@ int flush_rules(void *buf, void **nextbuf);
 
 int create_table(const char *table_name, void *buf, void **nextbuf);
 
+int delete_table(const char *table_name);
+
 int create_nat_chain(const char *table_name, const char *chain_name,
                      const nat_hook_chain_t hook_type,
                      void *buf, void **nextbuf);
