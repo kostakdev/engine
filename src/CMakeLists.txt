@@ -22,7 +22,7 @@ add_executable(kostak main.c)
 
 if(KOSTAK_STATIC)
 add_compile_options(-static)
-target_link_libraries(kostak -static)
+target_link_options(kostak PUBLIC "LINKER:-static-pie")
 endif(KOSTAK_STATIC)
 
 if(KOSTAK_BIG_STACK)
@@ -34,4 +34,4 @@ target_link_libraries(kostak rxilogc umm_malloc kostak_core ${LIBCAP_LIBRARIES} 
 target_include_directories(kostak PUBLIC ${LIBCAP_INCLUDE_DIRS} ${LIBSECCOMP_INCLUDE_DIRS})
 target_compile_options(kostak PUBLIC ${LIBCAP_CFLAGS_OTHER} ${LIBSECCOMP_CFLAGS_OTHER})
 set_property(TARGET kostak PROPERTY POSITION_INDEPENDENT_CODE ON)
-target_link_options(kostak PUBLIC "LINKER:-z,now" "LINKER:-z,defs" "LINKER:-z,relro")
+target_link_options(kostak PUBLIC "LINKER:-z,defs,relro,now")
