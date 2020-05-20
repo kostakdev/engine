@@ -12,6 +12,7 @@ static void print_usage() {
     "\t-r rootfs\t\tspecify the root filesystem\n"
     "\t-p <dest>:<host>\tport mapping from dest to host \n"
     "\t-m <hostdir>:<mount>\tmounting host directory to container\n"
+    "\t-s Enable sandbox\n"
     "\n"
     "Verbosity:\n"
     "\t-d turn on debug mode\n"
@@ -28,6 +29,7 @@ static struct option long_options[] = {
   {"verbose", no_argument,      0, 'v'},
   {"rootfs", required_argument, 0, 'r'},
   {"env", required_argument,    0, 'e'},
+  {"sandbox", no_argument, 0, 's'},
   {0,       0,                  0,  0 },
 };
 
@@ -52,7 +54,7 @@ void parse_arg(int argc, char **argv, exec_param_t *param)
 
   int c;
   int option_index = 0;
-  static const char *opt_short_string = "hu:vdtr:e:p:m:";
+  static const char *opt_short_string = "shu:vdtr:e:p:m:";
 
   param->log_level = LOG_WARN;
   param->utsname = default_hostname;
@@ -105,6 +107,9 @@ void parse_arg(int argc, char **argv, exec_param_t *param)
         } else {
           log_debug("%s is not a volume mapping syntax", optarg);
         }
+        break;
+      case 's':
+        param->sandbox = true;
         break; 
       case '?':
         print_usage();

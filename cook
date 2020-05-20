@@ -17,7 +17,7 @@ EXTRA_DEFS="--no-warn-unused-cli -DKOSTAK_TARGET_TRIPLET=${TARGET_TUPLE}"
 if test "x${OSNAME}" != "xLinux" || test "x${PROCESSOR}" != "x${TARGET_PROCESSOR}"
 then
   echo "The build computer is not the same with target, cross-compiling: ${TARGET_TUPLE}"
-  EXTRA_DEFS="${EXTRA_DEFS} -DKOSTAK_STATIC=1 -DKOSTAK_BIG_STACK=1 -DKOSTAK_TARGET_TRIPLET=${TARGET_TUPLE}"
+  EXTRA_DEFS="${EXTRA_DEFS} -DKOSTAK_TARGET_TRIPLET=${TARGET_TUPLE}"
   EXTRA_DEFS="${EXTRA_DEFS} -DCMAKE_TOOLCHAIN_FILE=../cmake/toolchain-kostak-linux-amd64.cmake"
 fi  
 
