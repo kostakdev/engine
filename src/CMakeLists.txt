@@ -11,7 +11,7 @@ include_directories(${kostak_SOURCE_DIR}/include
 set(SOURCES main.c child.c 
             param.c mount_ns.c 
             netlink_util.c net_eth.c 
-            net_forward.c util.c cap.c)
+            net_forward.c util.c cap.c seccomp_filter.c)
 
 add_compile_options(-Wall -Wextra -pedantic -Werror -fstack-protector-strong -fstack-clash-protection -fexceptions -pipe)
 if(CMAKE_BUILD_TYPE STREQUAL Release OR CMAKE_BUILD_TYPE STREQUAL MinSizeRel)

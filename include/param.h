@@ -15,6 +15,7 @@ struct exec_param {
   ptr_vec_t mounts;
   ptr_vec_t port_maps;
   bool sandbox;
+  bool seccomp;
 
   int in_pipe[2];
   int out_pipe[2];

@@ -3,6 +3,7 @@
 #include "child.h"
 #include "param.h"
 #include "mount_ns.h"
+#include "seccomp_filter.h"
 
 int child_exec(void *stuff) {
 
@@ -22,6 +23,10 @@ int child_exec(void *stuff) {
   }
 
   if (params->sandbox && (-1 == set_container_cap())) {
+    return EXIT_FAILURE;
+  }
+
+  if (params->seccomp && (-1 == enable_seccomp())) {
     return EXIT_FAILURE;
   }
 

@@ -29,7 +29,8 @@ static struct option long_options[] = {
   {"verbose", no_argument,      0, 'v'},
   {"rootfs", required_argument, 0, 'r'},
   {"env", required_argument,    0, 'e'},
-  {"sandbox", no_argument, 0, 's'},
+  {"sandbox", no_argument,      0, 's'},
+  {"seccomp", no_argument,      0, 'c'},
   {0,       0,                  0,  0 },
 };
 
@@ -54,7 +55,7 @@ void parse_arg(int argc, char **argv, exec_param_t *param)
 
   int c;
   int option_index = 0;
-  static const char *opt_short_string = "shu:vdtr:e:p:m:";
+  static const char *opt_short_string = "cshu:vdtr:e:p:m:";
 
   param->log_level = LOG_WARN;
   param->utsname = default_hostname;
@@ -110,7 +111,10 @@ void parse_arg(int argc, char **argv, exec_param_t *param)
         break;
       case 's':
         param->sandbox = true;
-        break; 
+        break;
+      case 'c':
+        param->seccomp = true;
+        break;
       case '?':
         print_usage();
         exit(EXIT_FAILURE);
