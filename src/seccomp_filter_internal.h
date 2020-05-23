@@ -1,4 +1,4 @@
-#ifndef SECCCOMP_FILTER_INTERNAL
+#ifndef SECCOMP_FILTER_INTERNAL
 #define SECCOMP_FILTER_INTERNAL 1
 
 static const char *syscalls[] = 
