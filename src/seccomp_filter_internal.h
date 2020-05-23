@@ -335,7 +335,68 @@ static const char *syscalls[] =
   "waitid",
   "waitpid",
   "write",
-  "writev"
+  "writev",
+
+  "ptrace",
+  
+  "personality",
+  
+  "sync_file_range2",
+  
+  "arch_prctl",
+  
+  "modify_ldt",
+  
+  "open_by_handle_at",
+
+  "bpf",
+  "clone",
+  "fanotify_init",
+  "lookup_dcookie",
+  "mount",
+  "name_to_handle_at",
+  "perf_event_open",
+  "quotactl",
+  "setdomainname",
+  "sethostname",
+  "setns",
+  "syslog",
+  "umount",
+  "umount2",
+  "unshare",
+
+  "clone",
+
+  "reboot",
+
+  "chroot",
+
+  "delete_module",
+	"init_module",
+	"finit_module",
+	"query_module",
+
+  "acct",
+
+  "kcmp",
+	"process_vm_readv",
+  "process_vm_writev",
+	"ptrace",
+
+  "iopl",
+	"ioperm",
+
+  "settimeofday",
+	"stime",
+	"clock_settime",
+
+  "vhangup",
+
+  "get_mempolicy",
+	"mbind",
+	"set_mempolicy",
+
+  "syslog"
 };
 
 #endif /* SECCCOMP_FILTER_INTERNAL */
